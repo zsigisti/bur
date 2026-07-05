@@ -1,0 +1,26 @@
+# /etc/systemd/system/bur-web.service on 192.168.0.76
+# Runs the BUR web app directly on :82 (no reverse proxy, no TLS on the box).
+[Unit]
+Description=BUR — Blueberry User Repository (Next.js)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=bur
+WorkingDirectory=/opt/bur/web
+EnvironmentFile=/opt/bur/web/.env
+# Binds 0.0.0.0:82 directly (see package.json "start").
+ExecStart=/usr/bin/npm run start
+Restart=always
+RestartSec=3
+# Let a non-root user bind the privileged port 82.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/opt/bur/web/.next
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

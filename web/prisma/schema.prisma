@@ -1,0 +1,173 @@
+// BUR data model — Azure SQL (SQL Server) via Prisma.
+// NOTE: SQL Server does not support Prisma enums, so role/status columns are
+// plain strings validated in app code (see src/lib/types.ts for the unions).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  email         String   @unique
+  passwordHash  String
+  emailVerified DateTime?
+  // "AUTHOR" | "MAINTAINER" | "CONTRIBUTOR"
+  globalRole    String   @default("CONTRIBUTOR")
+  approvedCount Int      @default(0)
+  trusted       Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  packagesOwned        Package[]             @relation("PackageOwner")
+  recipesSubmitted     Recipe[]              @relation("RecipeSubmitter")
+  recipesReviewed      Recipe[]              @relation("RecipeReviewer")
+  packageRoles         PackageRole[]
+  contributionRequests ContributionRequest[] @relation("RequestUser")
+  sessions             Session[]
+  twoFactorTokens      TwoFactorToken[]
+  loginEvents          LoginEvent[]
+  auditLogs            AuditLog[]            @relation("AuditActor")
+
+  @@index([globalRole])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  ip        String?
+  userAgent String?  @db.NVarChar(512)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model TwoFactorToken {
+  id        String   @id @default(cuid())
+  userId    String
+  codeHash  String
+  // "LOGIN_2FA" | "EMAIL_VERIFY" | "PASSWORD_RESET"
+  purpose   String
+  expiresAt DateTime
+  consumedAt DateTime?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+}
+
+model Package {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?  @db.NVarChar(1024)
+  homepage    String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner                User                  @relation("PackageOwner", fields: [ownerId], references: [id])
+  recipes              Recipe[]
+  roles                PackageRole[]
+  contributionRequests ContributionRequest[]
+
+  @@index([ownerId])
+}
+
+model Recipe {
+  id             String   @id @default(cuid())
+  packageId      String
+  version        String
+  release        Int      @default(1)
+  summary        String?  @db.NVarChar(1024)
+  bpmToml        String   @db.NVarChar(Max)
+  // "DRAFT" | "PENDING" | "APPROVED" | "REJECTED" | "PUBLISHED"
+  status         String   @default("PENDING")
+  builtLocally   Boolean  @default(false)
+  artifactSha256 String?
+  artifactSize   Int?
+  publishedRepo  String?  // e.g. "repo1.mmzsigmond.me"
+  publishedAt    DateTime?
+  rejectionReason String? @db.NVarChar(1024)
+  submittedById  String
+  reviewedById   String?
+  reviewedAt     DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  package     Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  submittedBy User    @relation("RecipeSubmitter", fields: [submittedById], references: [id])
+  reviewedBy  User?   @relation("RecipeReviewer", fields: [reviewedById], references: [id])
+
+  @@index([packageId])
+  @@index([status])
+  @@index([submittedById])
+}
+
+model PackageRole {
+  id        String   @id @default(cuid())
+  packageId String
+  userId    String
+  // "OWNER" | "CONTRIBUTOR"
+  role      String
+  grantedBy String?
+  grantedAt DateTime @default(now())
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, userId])
+  @@index([userId])
+}
+
+model ContributionRequest {
+  id         String   @id @default(cuid())
+  packageId  String
+  userId     String
+  message    String?  @db.NVarChar(1024)
+  // "PENDING" | "APPROVED" | "REJECTED"
+  status     String   @default("PENDING")
+  decidedById String?
+  decidedAt  DateTime?
+  createdAt  DateTime @default(now())
+
+  package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  user    User    @relation("RequestUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([packageId, userId])
+  @@index([status])
+}
+
+model LoginEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  ip        String?
+  userAgent String?  @db.NVarChar(512)
+  success   Boolean
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  action     String   // e.g. "recipe.approve", "package.create", "recipe.publish"
+  targetType String?
+  targetId   String?
+  metadata   String?  @db.NVarChar(Max)
+  ip         String?
+  createdAt  DateTime @default(now())
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id])
+
+  @@index([action])
+  @@index([actorId])
+}
