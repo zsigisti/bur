@@ -1,28 +1,29 @@
-// BUR data model — Azure SQL (SQL Server) via Prisma.
-// NOTE: SQL Server does not support Prisma enums, so role/status columns are
-// plain strings validated in app code (see src/lib/types.ts for the unions).
+// BUR data model — PostgreSQL via Prisma (self-hosted on .79).
+// Role/status columns are validated strings (see src/lib/types.ts). We keep the
+// child->User relations as NoAction and let Package own the cascade, so user
+// deletion stays an explicit admin action.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlserver"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String   @id @default(cuid())
-  username      String   @unique
-  email         String   @unique
+  id            String    @id @default(cuid())
+  username      String    @unique
+  email         String    @unique
   passwordHash  String
   emailVerified DateTime?
   // "AUTHOR" | "MAINTAINER" | "CONTRIBUTOR"
-  globalRole    String   @default("CONTRIBUTOR")
-  approvedCount Int      @default(0)
-  trusted       Boolean  @default(false)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  globalRole    String    @default("CONTRIBUTOR")
+  approvedCount Int       @default(0)
+  trusted       Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   packagesOwned        Package[]             @relation("PackageOwner")
   recipesSubmitted     Recipe[]              @relation("RecipeSubmitter")
@@ -42,7 +43,7 @@ model Session {
   userId    String
   tokenHash String   @unique
   ip        String?
-  userAgent String?  @db.NVarChar(512)
+  userAgent String?  @db.VarChar(512)
   expiresAt DateTime
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -51,15 +52,15 @@ model Session {
 }
 
 model TwoFactorToken {
-  id        String   @id @default(cuid())
-  userId    String
-  codeHash  String
+  id         String    @id @default(cuid())
+  userId     String
+  codeHash   String
   // "LOGIN_2FA" | "EMAIL_VERIFY" | "PASSWORD_RESET"
-  purpose   String
-  expiresAt DateTime
+  purpose    String
+  expiresAt  DateTime
   consumedAt DateTime?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, purpose])
 }
@@ -67,13 +68,13 @@ model TwoFactorToken {
 model Package {
   id          String   @id @default(cuid())
   name        String   @unique
-  description String?  @db.NVarChar(1024)
+  description String?  @db.VarChar(1024)
   homepage    String?
   ownerId     String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  owner                User                  @relation("PackageOwner", fields: [ownerId], references: [id])
+  owner                User                  @relation("PackageOwner", fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   recipes              Recipe[]
   roles                PackageRole[]
   contributionRequests ContributionRequest[]
@@ -82,29 +83,29 @@ model Package {
 }
 
 model Recipe {
-  id             String   @id @default(cuid())
-  packageId      String
-  version        String
-  release        Int      @default(1)
-  summary        String?  @db.NVarChar(1024)
-  bpmToml        String   @db.NVarChar(Max)
+  id              String    @id @default(cuid())
+  packageId       String
+  version         String
+  release         Int       @default(1)
+  summary         String?   @db.VarChar(1024)
+  bpmToml         String    @db.Text
   // "DRAFT" | "PENDING" | "APPROVED" | "REJECTED" | "PUBLISHED"
-  status         String   @default("PENDING")
-  builtLocally   Boolean  @default(false)
-  artifactSha256 String?
-  artifactSize   Int?
-  publishedRepo  String?  // e.g. "repo1.mmzsigmond.me"
-  publishedAt    DateTime?
-  rejectionReason String? @db.NVarChar(1024)
-  submittedById  String
-  reviewedById   String?
-  reviewedAt     DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  status          String    @default("PENDING")
+  builtLocally    Boolean   @default(false)
+  artifactSha256  String?
+  artifactSize    Int?
+  publishedRepo   String?
+  publishedAt     DateTime?
+  rejectionReason String?   @db.VarChar(1024)
+  submittedById   String
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   package     Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  submittedBy User    @relation("RecipeSubmitter", fields: [submittedById], references: [id])
-  reviewedBy  User?   @relation("RecipeReviewer", fields: [reviewedById], references: [id])
+  submittedBy User    @relation("RecipeSubmitter", fields: [submittedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reviewedBy  User?   @relation("RecipeReviewer", fields: [reviewedById], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([packageId])
   @@index([status])
@@ -121,25 +122,25 @@ model PackageRole {
   grantedAt DateTime @default(now())
 
   package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([packageId, userId])
   @@index([userId])
 }
 
 model ContributionRequest {
-  id         String   @id @default(cuid())
-  packageId  String
-  userId     String
-  message    String?  @db.NVarChar(1024)
+  id          String    @id @default(cuid())
+  packageId   String
+  userId      String
+  message     String?   @db.VarChar(1024)
   // "PENDING" | "APPROVED" | "REJECTED"
-  status     String   @default("PENDING")
+  status      String    @default("PENDING")
   decidedById String?
-  decidedAt  DateTime?
-  createdAt  DateTime @default(now())
+  decidedAt   DateTime?
+  createdAt   DateTime  @default(now())
 
   package Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
-  user    User    @relation("RequestUser", fields: [userId], references: [id], onDelete: Cascade)
+  user    User    @relation("RequestUser", fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([packageId, userId])
   @@index([status])
@@ -149,7 +150,7 @@ model LoginEvent {
   id        String   @id @default(cuid())
   userId    String
   ip        String?
-  userAgent String?  @db.NVarChar(512)
+  userAgent String?  @db.VarChar(512)
   success   Boolean
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -160,13 +161,13 @@ model LoginEvent {
 model AuditLog {
   id         String   @id @default(cuid())
   actorId    String?
-  action     String   // e.g. "recipe.approve", "package.create", "recipe.publish"
+  action     String
   targetType String?
   targetId   String?
-  metadata   String?  @db.NVarChar(Max)
+  metadata   String?  @db.Text
   ip         String?
   createdAt  DateTime @default(now())
-  actor      User?    @relation("AuditActor", fields: [actorId], references: [id])
+  actor      User?    @relation("AuditActor", fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([action])
   @@index([actorId])

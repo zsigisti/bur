@@ -19,3 +19,14 @@ cli/target/
 *.log
 .DS_Store
 *.bpm
+
+# hardened
+**/.env
+*.pem
+cli/target/
+web/.next/
+
+# runtime data (NOT source)
+repo1/
+backups/
+*.sql.gz

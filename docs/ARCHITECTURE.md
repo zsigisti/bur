@@ -14,7 +14,7 @@ Blueberry (distro) → bpm (manager) → .bpm (package) → bpm.toml (recipe)
 
 | Component | Tech | Where it runs |
 |---|---|---|
-| **Web app** (`web/`) | Next.js (App Router) + TypeScript + React | `192.168.0.76:82`, public at `bur.mmzsigmond.me` |
+| **Web app** (`web/`) | Next.js (App Router) + TypeScript + React | `192.168.0.79:82`, public at `bur.mmzsigmond.me` |
 | **Database** | Azure SQL (SQL Server), Prisma ORM | Azure free tier |
 | **CLI** (`cli/`) | Rust, single static binary `bur` | user machines; installed via `bpm install bur` |
 | **Email/2FA** | Resend | — |
@@ -25,13 +25,12 @@ The two mirrors are **separate**: `repo.mmzsigmond.me` is the official, curated
 Blueberry repo; `repo1.mmzsigmond.me` is where approved community (BUR) `.bpm`
 files land. `bur` installs from `repo1`; `bpm` installs from `repo`.
 
-## Networking (.76)
+## Networking (.79)
 
-- nginx already serves the existing site on `:80` — **left intact**.
-- BUR web app listens on **`:82`, plain HTTP, no TLS, no reverse-proxy forwarding
-  on the box** (per spec). Public TLS terminates at the Cloudflare edge for
-  `bur.mmzsigmond.me`, same pattern as the existing mirror; the box only ever
-  speaks plain HTTP on `:82`.
+- nginx already serves the `blueberry-repo` mirror on `:80` — **left intact**.
+- nginx serves BUR on **`:82`, plain HTTP** and proxies to the Next.js app on
+  `127.0.0.1:3000`. No TLS on the box. Public TLS terminates at the Cloudflare
+  edge for `bur.mmzsigmond.me`, same pattern as the existing mirror.
 - Because the public origin is HTTPS (Cloudflare), session cookies are still set
   `Secure`.
 

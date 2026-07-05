@@ -2,7 +2,9 @@
 const nextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
-  // Public TLS terminates at the Cloudflare edge; the box speaks plain HTTP :82.
+  // Static pages can't carry a per-request nonce, so we use a same-origin CSP
+  // that still forbids external scripts/objects. Once the app's pages are mostly
+  // dynamic (authed dashboards), we can switch to a nonce CSP via middleware.
   async headers() {
     return [
       {
@@ -14,7 +16,7 @@ const nextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'",
+              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
           },
         ],
       },

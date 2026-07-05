@@ -15,7 +15,7 @@ trust model, submission flow, and security posture.
 bur/
   web/    Next.js + TypeScript site & API, Prisma → Azure SQL
   cli/    Rust `bur` client
-  deploy/ runbook for 192.168.0.76:82
+  deploy/ runbook for 192.168.0.79:82
   docs/   architecture
 ```
 

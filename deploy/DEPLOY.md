@@ -1,8 +1,8 @@
-# Deploying BUR on 192.168.0.76
+# Deploying BUR on 192.168.0.79
 
-Debian 13, nginx already on `:80` (existing blueberry site — **do not touch**).
-BUR runs on `:82`, plain HTTP, no reverse proxy. Public TLS is at the Cloudflare
-edge (tunnel to `192.168.0.76:82`).
+Ubuntu 22.04, nginx already on `:80` (the `blueberry-repo` mirror site — **do
+not touch**). nginx serves BUR on `:82` (plain HTTP) and proxies to the app on
+`127.0.0.1:3000`. Public TLS is at the Cloudflare edge (to `192.168.0.79:82`).
 
 ## 1. Node.js (not yet installed on the box)
 
@@ -35,7 +35,7 @@ curl -sS http://127.0.0.1:82/ | head   # smoke test
 
 ## 4. Cloudflare
 
-Point `bur.mmzsigmond.me` at `192.168.0.76:82` via the same tunnel mechanism the
+Point `bur.mmzsigmond.me` at `192.168.0.79:82` via the same tunnel mechanism the
 existing mirror uses. Nothing on the box terminates TLS.
 
 ## Community mirror (repo1.mmzsigmond.me)
