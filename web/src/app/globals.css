@@ -4,14 +4,14 @@
 
 :root {
   --bg: #ffffff;
-  --bg-subtle: #f4f4f4;
-  --ink: #0a0a0a;          /* the main color: black */
-  --ink-soft: #1a1a1a;
-  --fg: #0a0a0a;
-  --fg-muted: #6a6a6a;
-  --line: #e4e4e4;
-  --line-strong: #0a0a0a;
-  --accent: #0a0a0a;
+  --bg-subtle: #eef2f1;
+  --ink: #06463c;          /* the main color: blueberry teal-green */
+  --ink-soft: #0a564a;
+  --fg: #12231e;           /* body text: dark teal-green, readable on white */
+  --fg-muted: #5a6f68;
+  --line: #dde5e2;
+  --line-strong: #06463c;
+  --accent: #3f63b0;       /* blueberry blue */
   --maxw: 1160px;
 }
 
@@ -33,7 +33,7 @@ h1 { font-size: 3rem; }
 h2 { font-size: 2rem; }
 h3 { font-size: 1.15rem; letter-spacing: -0.02em; }
 p { margin: 0 0 1rem; }
-a { color: var(--ink); text-decoration: none; }
+a { color: var(--accent); text-decoration: none; }
 a:hover { text-decoration: underline; }
 hr { border: 0; border-top: 1px solid var(--line-strong); margin: 2.5rem 0; }
 

@@ -11,20 +11,20 @@ function codeEmail(opts: { title: string; intro: string; code: string; note: str
   <body style="margin:0;padding:0;background:#f4f4f4;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:32px 16px;">
       <tr><td align="center">
-        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border:1px solid #0a0a0a;">
-          <tr><td style="background:#0a0a0a;padding:18px 26px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border:1px solid #06463c;">
+          <tr><td style="background:#06463c;padding:18px 26px;">
             <span style="color:#ffffff;font-size:17px;font-weight:800;letter-spacing:-0.02em;">BUR</span>
             <span style="color:#8a8a8a;font-size:12px;font-weight:500;margin-left:8px;">Blueberry User Repository</span>
           </td></tr>
           <tr><td style="padding:32px 26px;">
-            <h1 style="margin:0 0 12px;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#0a0a0a;">${opts.title}</h1>
+            <h1 style="margin:0 0 12px;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#06463c;">${opts.title}</h1>
             <p style="margin:0 0 24px;font-size:15px;line-height:1.6;color:#5b5b67;">${opts.intro}</p>
             <div style="text-align:center;margin:0 0 24px;">
-              <span style="display:inline-block;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:30px;font-weight:800;letter-spacing:10px;color:#0a0a0a;background:#f4f4f4;border:1px solid #0a0a0a;padding:16px 20px 16px 30px;">${opts.code}</span>
+              <span style="display:inline-block;font-family:'SF Mono',Menlo,Consolas,monospace;font-size:30px;font-weight:800;letter-spacing:10px;color:#06463c;background:#f4f4f4;border:1px solid #06463c;padding:16px 20px 16px 30px;">${opts.code}</span>
             </div>
             <p style="margin:0;font-size:13px;line-height:1.6;color:#8a8a8a;">${opts.note}</p>
           </td></tr>
-          <tr><td style="padding:16px 26px;border-top:1px solid #0a0a0a;background:#0a0a0a;">
+          <tr><td style="padding:16px 26px;border-top:1px solid #06463c;background:#06463c;">
             <p style="margin:0;font-size:12px;color:#8a8a8a;">Blueberry User Repository &middot; community package repository</p>
           </td></tr>
         </table>
