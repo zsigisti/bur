@@ -19,6 +19,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="masthead">
           <div className="bar">
             <a className="brand" href="/">
+              <img src="/logo.png" alt="" className="brand-mark" />
               BUR<span className="sub hide-sm">Blueberry User Repository</span>
             </a>
             <nav>
