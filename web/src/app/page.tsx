@@ -3,6 +3,13 @@ import HeroTerminal from "@/components/HeroTerminal";
 
 const HEADLINE = ["Build", "it.", "Review", "it.", "Publish", "it."];
 
+const STEPS: [string, string, string][] = [
+  ["01", "Write", "Author a bpm.toml recipe — the exact format the official Blueberry repository uses."],
+  ["02", "Build", "Build the package on your own machine with bur build. Every submission is built by its author."],
+  ["03", "Review", "Submit for review. A maintainer approves it — and after twenty approved recipes, yours publish without review."],
+  ["04", "Publish", "Publish the built package to the community mirror. Anyone can install it with bur install."],
+];
+
 export default function Home() {
   return (
     <>
@@ -15,7 +22,7 @@ export default function Home() {
             {HEADLINE.map((w, i) => (
               <span key={i} className="word" style={{ animationDelay: `${i * 90}ms` }}>
                 {w}
-                {i < HEADLINE.length - 1 ? " " : ""}
+                {i < HEADLINE.length - 1 ? " " : ""}
               </span>
             ))}
           </h1>
@@ -32,19 +39,36 @@ export default function Home() {
         </div>
       </section>
 
-      {/* HOW IT WORKS — scroll-snap slides */}
+      {/* BRAND SHOWCASE */}
+      <section className="brandshow">
+        <div className="wrap">
+          <Reveal dir="left">
+            <div>
+              <div className="kicker">Grown by the community</div>
+              <p className="statement">
+                Every package, planted by someone who needed it.
+              </p>
+              <p className="lede muted" style={{ maxWidth: "42ch", marginTop: "1.25rem" }}>
+                BUR is where Blueberry users share the software they build — from a
+                one-line CLI tool to a full server stack. Ripe, reviewed, and ready
+                to install.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal dir="right" delay={120}>
+            <img src="/banner.png" alt="Blueberries" loading="lazy" />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS — slideshow */}
       <section>
         <div className="wrap section" style={{ paddingBottom: "2rem" }}>
           <div className="kicker">How it works</div>
           <h2>Four steps from recipe to install.</h2>
         </div>
         <div className="slides">
-          {[
-            ["01", "Write", "Author a bpm.toml recipe — the exact format the official Blueberry repository uses."],
-            ["02", "Build", "Build the package on your own machine with bur build. Every submission is built by its author."],
-            ["03", "Review", "Submit for review. A maintainer approves it — and after twenty approved recipes, yours publish without review."],
-            ["04", "Publish", "Publish the built package to the community mirror. Anyone can then install it with bur install."],
-          ].map(([num, title, body]) => (
+          {STEPS.map(([num, title, body]) => (
             <div className="slide" key={num}>
               <div className="num">{num}</div>
               <h3>{title}</h3>
@@ -55,19 +79,38 @@ export default function Home() {
         <div className="slides-hint">scroll →</div>
       </section>
 
-      {/* STATEMENT */}
+      {/* TERMINAL DEMO */}
       <section className="dark on-dark">
+        <div className="wrap section" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "3rem", alignItems: "center" }}>
+          <Reveal dir="left">
+            <div>
+              <div className="kicker" style={{ color: "var(--accent-soft)" }}>Watch it work</div>
+              <h2 style={{ color: "#fff" }}>One client. Search, build, submit, publish.</h2>
+              <p className="lede" style={{ color: "rgba(255,255,255,.8)", marginTop: "1rem" }}>
+                The <code>bur</code> client does it all from the command line —
+                installed on demand with <code>bpm install bur</code>.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal dir="right" delay={120}>
+            <HeroTerminal />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* THE MODEL */}
+      <section>
         <div className="wrap section">
           <Reveal>
-            <div className="kicker" style={{ color: "#8a8a8a" }}>The model</div>
+            <div className="kicker">The model</div>
           </Reveal>
           <Reveal delay={80}>
-            <p className="statement">
+            <p className="statement" style={{ maxWidth: "30ch" }}>
               Open to everyone. Reviewed by maintainers. Trusted after twenty.
             </p>
           </Reveal>
           <Reveal delay={160}>
-            <p className="lede" style={{ marginTop: "1.5rem" }}>
+            <p className="lede muted" style={{ marginTop: "1.5rem", maxWidth: "60ch" }}>
               Package authors own their packages. Contributors apply for access.
               Maintainers keep the mirror trustworthy. Nothing ships unbuilt.
             </p>
@@ -77,7 +120,7 @@ export default function Home() {
 
       {/* GET THE CLIENT */}
       <section>
-        <div className="wrap section" style={{ maxWidth: "760px" }}>
+        <div className="wrap section" style={{ maxWidth: "780px", paddingTop: 0 }}>
           <Reveal>
             <div className="kicker">Get started</div>
             <h2>Install the client.</h2>
