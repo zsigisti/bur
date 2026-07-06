@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { currentUserFull } from "@/lib/session";
 import { isMaintainer, isAuthor } from "@/lib/permissions";
 import SignOut from "@/components/SignOut";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export const metadata: Metadata = {
   title: "BUR — Blueberry User Repository",
@@ -11,16 +10,12 @@ export const metadata: Metadata = {
     "The community package repository for Blueberry Linux. Write a recipe, build it, get it reviewed, and publish it for everyone.",
 };
 
-// Applied before paint so the chosen theme doesn't flash.
-const THEME_INIT = `try{var t=localStorage.getItem('theme');if(!t){t=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'}document.documentElement.dataset.theme=t}catch(e){}`;
-
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const user = await currentUserFull();
 
   return (
     <html lang="en">
       <body>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
         <header className="masthead">
           <div className="bar">
             <a className="brand" href="/">
@@ -31,7 +26,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <a href="/packages">Packages</a>
               <a href="/submit">Submit</a>
               <a href="/docs">Docs</a>
-              <a href="/support" className="hide-sm">Support</a>
               {user ? (
                 <>
                   <a href="/dashboard">Dashboard</a>
@@ -45,7 +39,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   Sign in
                 </a>
               )}
-              <ThemeToggle />
             </nav>
           </div>
         </header>
@@ -56,10 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="wrap">
             <div className="cols">
               <div className="col">
-                <a className="brand" href="/">
-                  <img src="/logo-green.png" alt="" className="brand-mark" />
-                  BUR
-                </a>
+                <a className="brand" href="/">BUR</a>
                 <p className="about">
                   The community package repository for Blueberry Linux. Recipes
                   are written, built, reviewed, and published by the community.
@@ -70,7 +60,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 <a href="/packages">Packages</a>
                 <a href="/submit">Submit a package</a>
                 <a href="/docs">Documentation</a>
-                <a href="/support">Support the project</a>
               </div>
               <div className="col">
                 <h4>Repositories</h4>
