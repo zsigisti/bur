@@ -43,7 +43,7 @@ hr { border: 0; border-top: 1px solid var(--line-strong); margin: 2.5rem 0; }
 .masthead { position: sticky; top: 0; z-index: 30; background: var(--ink); color: #fff; border-bottom: 1px solid var(--ink); }
 .masthead .bar { display: flex; align-items: center; gap: 2rem; max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; height: 58px; }
 .brand { display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.15rem; letter-spacing: -0.03em; color: #fff; }
-.brand-mark { height: 24px; width: 24px; filter: invert(1); }
+.brand-mark { height: 26px; width: 26px; border-radius: 0; object-fit: cover; }
 .brand:hover { text-decoration: none; }
 .brand .sub { color: #9a9a9a; font-weight: 500; margin-left: 0.6rem; font-size: 0.85rem; letter-spacing: 0; }
 .masthead nav { display: flex; align-items: center; gap: 1.4rem; margin-left: auto; }
